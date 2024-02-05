@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "start": "node build/server.js",
     "dev": "tsx watch src/server.ts",
     "copy-public": "tsx ./scripts/copy-public.ts",
     "build": "tsup && yarn copy-public"
