@@ -1,8 +1,11 @@
 {
   "compilerOptions": {
+    "module": "ESNext",
+    "target": "esnext",  
+    "moduleResolution": "node",
     "strict": true,
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
-    "esModuleInterop": true
+    "esModuleInterop": true,
   }
 }

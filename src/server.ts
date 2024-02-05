@@ -60,7 +60,7 @@ app.get('/images/score/static/:id', async (c) => {
     return await c.text('Not found', 404)
   }
 
-  const { file, type } = getImage(imagesMap[id])
+  const { file, type } = await getImage(imagesMap[id])
   return new Response(file, {
     headers: {
       'Content-Type': type ?? 'image/png'

@@ -1,6 +1,6 @@
 import * as fs from 'fs'
-import mime from 'mime';
 import Jimp from 'jimp';
+const mime = import('mime')
 
 const API_BASE = 'https://api.yup.io'
 
@@ -73,9 +73,10 @@ export const frameHtml = ({
     </html>`
 }
 
-export const getImage = (path: string) => {
+export const getImage = async (path: string) => {
     const file = fs.readFileSync(path)
-    const type = mime.getType(path)
+    const mimeLib = (await mime).default
+    const type = mimeLib.getType(path)
     return {
         file,
         type
