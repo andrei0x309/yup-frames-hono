@@ -22,6 +22,10 @@ if (SENTRY_DSN) {
   Sentry.init({ dsn: `https://${SENTRY_DSN}` });
 }
 
+const logRequest = async (data: any) => {
+  Sentry.captureMessage('FRAME_REQUEST', data)
+}
+
 const imagesMap = {
   'score-base': './public/yup-score-base.png',
   'score-error': './public/yup-score-error.png',
@@ -102,9 +106,11 @@ app.get(AVAILABLE_FRAMES.FRAME_SCORE, (c) => {
 })
 
 app.post(AVAILABLE_FRAMES.FRAME_SCORE, async (c) => {
-  const { untrustedData: { fid } } = await c.req.json()
-
+  const { untrustedData} = await c.req.json()
+  const { fid } = untrustedData
   const address = await getAddressFromFid(fid)
+
+  logRequest({ untrustedData })
 
   if (!address) {
     return c.html(frameHtml({
@@ -140,9 +146,12 @@ app.get(AVAILABLE_FRAMES.FRAME_ELIGIBILITY, async (c) => {
 })
 
 app.post(AVAILABLE_FRAMES.FRAME_ELIGIBILITY, async (c) => {
-  const { untrustedData: { fid } } = await c.req.json()
+  const { untrustedData} = await c.req.json()
+  const { fid } = untrustedData
 
   const address = await getAddressFromFid(fid)
+
+  logRequest({ untrustedData })
 
   if (!address) {
     return c.html(frameHtml({

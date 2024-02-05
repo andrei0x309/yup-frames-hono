@@ -9,8 +9,8 @@ export const AVAILABLE_FRAMES = {
     FRAME_ELIGIBILITY: '/frame/eligible'
 }
 
-const TESTING = true
-export const HOST = TESTING ? `http://fstun.flashsoft.eu` : 'https://www.example.com'
+const TESTING = false
+export const HOST = TESTING ? `http://fstun.flashsoft.eu` : 'https://yup-frames.cyclic.app'
 
 const BODYHTML = `
     <body style="background-color: #f5f5f5; padding: 0; margin: 0;">
