@@ -10,7 +10,9 @@ import {
   checkEligibility,
   getAddressFromFid,
   AVAILABLE_FRAMES,
-  HOST
+  AVAILABLE_FRAMES_TX,
+  HOST,
+  sendNativeTokenTx
 }
   from './utils'
 import * as Sentry from "@sentry/node";
@@ -33,7 +35,10 @@ const imagesMap = {
   'eligible-yes': './public/signup/yup-signup-yes.png',
   'eligible-no': './public/signup/yup-signup-no.png',
   'eligible-error-account': './public/signup/yup-signup-error-account.png',
-  'eligible-error-no-fid': './public/signup/yup-signup-no-fid.png'
+  'eligible-error-no-fid': './public/signup/yup-signup-no-fid.png',
+  'donate-initial': './public/donate/donate-initial.png',
+  'donate-success': './public/donate/donate-success.png',
+  'donate-error': './public/donate/donate-error.png',
 } as const
 
 const app = new Hono()
@@ -57,7 +62,7 @@ app.get('/frame/redirect/yup', (c) => {
 })
 
 
-app.get('/images/score/static/:id', async (c) => {
+app.get('/images/static/:id', async (c) => {
   const id = (c.req.param('id') ?? '1') as keyof typeof imagesMap
 
   if (!imagesMap[id]) {
@@ -93,7 +98,7 @@ app.get(AVAILABLE_FRAMES.FRAME_SCORE, (c) => {
   return c.html(frameHtml({
     title: 'Yup Score',
     description: 'Get your yup score with farcaster frame',
-    image: `${HOST}/images/score/static/score-base`,
+    image: `${HOST}/images/static/score-base`,
     postUrl: `${HOST}/frame/score`,
     buttons: [
       {
@@ -116,7 +121,7 @@ app.post(AVAILABLE_FRAMES.FRAME_SCORE, async (c) => {
     return c.html(frameHtml({
       title: 'Yup Score',
       description: 'Get your yup score with farcaster frame',
-      image: `${HOST}/images/score/static/score-error`,
+      image: `${HOST}/images/static/score-error`,
       postUrl: `${HOST}/frame/score`
     }))
   }
@@ -133,7 +138,7 @@ app.get(AVAILABLE_FRAMES.FRAME_ELIGIBILITY, async (c) => {
   return c.html(frameHtml({
     title: 'Yup Signup',
     description: 'Check if you are eligible for yup with farcaster frame',
-    image: `${HOST}/images/score/static/eligible-initial`,
+    image: `${HOST}/images/static/eligible-initial`,
     postUrl: `${HOST}/frame/eligible`,
     buttons: [
       {
@@ -157,7 +162,7 @@ app.post(AVAILABLE_FRAMES.FRAME_ELIGIBILITY, async (c) => {
     return c.html(frameHtml({
       title: 'Yup Signup',
       description: 'Check if you are eligible for yup with farcaster frame',
-      image: `${HOST}/images/score/static/eligible-error-no-fid`,
+      image: `${HOST}/images/static/eligible-error-no-fid`,
       postUrl: `${HOST}/frame/eligible`
     }))
   }
@@ -168,7 +173,7 @@ app.post(AVAILABLE_FRAMES.FRAME_ELIGIBILITY, async (c) => {
     return c.html(frameHtml({
       title: 'Yup Signup',
       description: 'Check if you are eligible for yup with farcaster frame',
-      image: `${HOST}/images/score/static/eligible-error-account`,
+      image: `${HOST}/images/static/eligible-error-account`,
       postUrl: `${HOST}/frame/eligible`
     }))
   }
@@ -179,7 +184,7 @@ app.post(AVAILABLE_FRAMES.FRAME_ELIGIBILITY, async (c) => {
     return c.html(frameHtml({
       title: 'Yup Signup',
       description: 'Check if you are eligible for yup with farcaster frame',
-      image: `${HOST}/images/score/static/eligible-yes`,
+      image: `${HOST}/images/static/eligible-yes`,
       postUrl: `${HOST}/frame/redirect/yup`,
       buttons: [
         {
@@ -193,12 +198,75 @@ app.post(AVAILABLE_FRAMES.FRAME_ELIGIBILITY, async (c) => {
     return c.html(frameHtml({
       title: 'Yup Signup',
       description: 'Check if you are eligible for yup with farcaster frame',
-      image: `${HOST}/images/score/static/eligible-no`,
+      image: `${HOST}/images/static/eligible-no`,
       postUrl: `${HOST}/frame/eligible`
     }))
   }
 })
 
+app.get(AVAILABLE_FRAMES.FRAME_DONATE, async (c) => {
+  const address = '0x01Ca6f13E48fC5E231351bA38e7E51A1a7835d8D'
+  const amount = '0.00001'
+  const chainId = 84532
+
+  const getTargetUrl = (address: string, amount: string, chainId: number) => {
+    return `${HOST}/frame/donate-tx?address=${address}&amount=${amount}&chainId=${chainId}`
+  }
+
+  const getFrameUrl = () => `${HOST}${AVAILABLE_FRAMES.FRAME_DONATE}`
+
+  const buttons = [{
+    text: 'Donate 0.00001 ETH',
+    index: 1,
+    redirect: false,
+    action: 'tx',
+    target: getTargetUrl(address, amount, chainId),
+    post_url: getFrameUrl()
+  }]
+
+  const html = frameHtml({
+    title: 'Donate',
+    image: `${HOST}/images/static/donate-initial`,
+    postUrl: `${HOST}/frame/donate`,
+    buttons
+  })
+ 
+  return c.html(html)
+})
+
+app.post(AVAILABLE_FRAMES.FRAME_DONATE, async (c) => {
+
+  const { untrustedData } = await c.req.json()
+  console.log(untrustedData)
+  const { transactionId } = untrustedData
+
+  if (!transactionId) {
+    return c.html(frameHtml({
+      title: 'Donate',
+      image: `${HOST}/images/static/donate-error`,
+      postUrl: `${HOST}/frame/donate`
+    }))
+  }
+
+  return c.html(frameHtml({
+    title: 'Donate',
+    image: `${HOST}/images/static/donate-success`,
+    postUrl: `${HOST}/frame/donate`
+  }))
+
+  // logRequest({ untrustedData })
+
+})
+
+app.post(AVAILABLE_FRAMES_TX.FRAME_DONATE_TX, async (c) => {
+   console.log(await c.req.json())
+
+   const { address, amount, chainId } = c.req.query()
+   const json = await sendNativeTokenTx(address, amount, chainId)
+  console.log(json)
+
+   return c.json(json)
+})
 
 console.log(`Server is running on port ${port}`)
 
