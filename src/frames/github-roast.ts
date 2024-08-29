@@ -9,6 +9,7 @@ const FID_LIMIT = 10;
 const DAILY_LIMIT = 100;
 const TABLE = 'frame-github-roast'
 const FNT = './public/github/BP03304.TTF/N0gAexmDkV8rEAhiXcPC0Jno.TTF.fnt'
+const GH_POXY = 'https://api-gh-username.deno.dev'
 
 const getcastIntent = (profile: string) => {
     const message = `Roast GitHub profiles, 10 roasts per FID.\nThis is the Roast of ${profile}\n`
@@ -100,8 +101,29 @@ const getRoastByProfile = async (githubProfile: string) => {
 }
 
 const checkGHUsernameExists = async (username: string) => {
-    const req = await fetch(`https://api.github.com/users/${username}`)
-    return req.status === 200
+    try {
+        const req = await fetch(GH_POXY, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username }),
+    })
+    const data = await req.json()
+
+    const exists = data?.id ? true : false
+
+    if (!exists) {
+        console.error(data)
+        return false
+    }
+
+    return true
+    
+    } catch (e) {
+        console.error(e)
+        return false
+    }
 }
 
 const getRoastImage = async (roast: string) => {
