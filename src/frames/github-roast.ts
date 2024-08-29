@@ -19,14 +19,14 @@ const getcastIntent = (profile: string) => {
 }
 
 const redirectAuthor = (index: number) => ({
-    text: 'Author Profile',
+    text: 'Author',
     index,
     redirect: true,
     link: 'https://warpcast.com/andrei0x309'
 })
 
 const redirectShare = (index: number, profile: string) => ({
-    text: 'Share',
+    text: 'Share This Roast',
     index,
     redirect: true,
     link: getcastIntent(profile)
