@@ -16,7 +16,7 @@ export const AVAILABLE_FRAMES_TX = {
 }
 
 const TESTING = false
-export const HOST = TESTING ? `https://fstun.flashsoft.eu` : 'https://yup-frames.cyclic.app'
+export const HOST = TESTING ? `https://fstun.flashsoft.eu` : 'https://fc-frames.koyeb.app'
 
 const BODYHTML = `
     <body style="background-color: #f5f5f5; padding: 0; margin: 0;">
