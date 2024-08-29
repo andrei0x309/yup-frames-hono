@@ -11,7 +11,7 @@ const TABLE = 'frame-github-roast'
 const FNT = './public/github/BP03304.TTF/N0gAexmDkV8rEAhiXcPC0Jno.TTF.fnt'
 
 const getcastIntent = (profile: string) => {
-    const message = `Roast github profiles, 10 roast per FID.\nThis is the Roast of ${profile}\n`
+    const message = `Roast GitHub profiles, 10 roasts per FID.\nThis is the Roast of ${profile}\n`
     const emebd = `${HOST}/frame/github-roast/${profile}`
     return `https://warpcast.com/~/compose?text=${encodeURI(message)}&embeds[]=${emebd}`
 
@@ -43,7 +43,6 @@ export const imagesMap = {
 
 export const generateNewRoast = async (githubProfile: string) => {
     try {
-    console.log('Generating new roast, profile:', githubProfile)
     const req = await fetch("https://github-roast.pages.dev/llama", {
         "headers": {
           "accept": "*/*",
@@ -72,9 +71,6 @@ export const generateNewRoast = async (githubProfile: string) => {
       })
      
         const data = await req.json()
-
-        console.log('Result:', data)
-
         return data.roast
 
     } catch (e) {
@@ -100,7 +96,6 @@ const getCountByFid = async (fid: string) => {
 const getRoastByProfile = async (githubProfile: string) => {
     const supaDB = await getSupaClient()
     const roast = await supaDB.from(TABLE).select('roast').eq('username', githubProfile)
-    console.log('Roast DB:', roast)
     return roast.data?.[0]?.roast ?? null
 }
 
@@ -112,7 +107,6 @@ const checkGHUsernameExists = async (username: string) => {
 const getRoastImage = async (roast: string) => {
 
     const image = await Jimp.read('./public/github/base.png')
-    console.log('Roast:', Jimp.FONT_SANS_16_WHITE)
     const font = await Jimp.loadFont(FNT)
 
     const maxCharsPerLine = 90
@@ -288,11 +282,8 @@ export const ghHandleProfileFrame = async (c : Context) => {
             }))
         }
 
-        console.log('Roast:', result)
 
-        const dbSave = await supaDB.from(TABLE).upsert({ roast: result, username: profile, fid, cast_hash: castHash })
-
-        console.log('DB Save:', dbSave)
+        await supaDB.from(TABLE).upsert({ roast: result, username: profile, fid, cast_hash: castHash })
 
         roast = result
     }
