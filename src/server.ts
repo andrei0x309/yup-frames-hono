@@ -16,6 +16,7 @@ import {
 }
   from './utils'
 import * as Sentry from "@sentry/node";
+import { ghHandleProfileIntial, ghHandleProfileFrame, imagesMap as ghImagesMap } from './frames/github-roast'
 
 const port = Number(process.env.PORT) || 4001
 const SENTRY_DSN = process.env.SENTRY_DSN || ''
@@ -61,6 +62,22 @@ app.get('/frame/redirect/yup', (c) => {
   return c.redirect('https://yup.io')
 })
 
+app.get('/images/static/gh-frame/:id', async (c) => {
+  const id = (c.req.param('id') ?? '1') as keyof typeof ghImagesMap
+
+  if (!ghImagesMap[id]) {
+    return await c.text('Not found', 404)
+  }
+
+  const { file, type } = await getImage(ghImagesMap[id])
+  return new Response(file, {
+    headers: {
+      'Content-Type': type ?? 'image/webp'
+    },
+    status: 200
+  });
+})
+
 
 app.get('/images/static/:id', async (c) => {
   const id = (c.req.param('id') ?? '1') as keyof typeof imagesMap
@@ -92,7 +109,6 @@ app.get('/images/score/address/:id', async (c) => {
     status: 200
   });
 })
-
 
 app.get(AVAILABLE_FRAMES.FRAME_SCORE, (c) => {
   return c.html(frameHtml({
@@ -267,6 +283,12 @@ app.post(AVAILABLE_FRAMES_TX.FRAME_DONATE_TX, async (c) => {
 
    return c.json(json)
 })
+
+app.get('/frame/github-roast', ghHandleProfileIntial)
+app.post('/frame/github-roast', ghHandleProfileIntial)
+app.post('/frame/github-roast-generate', ghHandleProfileFrame)
+app.post('/frame/github-roast/:profile', ghHandleProfileFrame)
+app.get('/frame/github-roast/:profile', ghHandleProfileFrame)
 
 console.log(`Server is running on port ${port}`)
 

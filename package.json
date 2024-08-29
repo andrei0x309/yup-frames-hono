@@ -8,6 +8,8 @@
   "dependencies": {
     "@hono/node-server": "^1.7.0",
     "@sentry/node": "^7.99.0",
+    "@supabase/supabase-js": "^2.45.2",
+    "dotenv": "^16.4.5",
     "hono": "^3.12.8",
     "jimp": "^0.22.10",
     "mime": "^4.0.1",

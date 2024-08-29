@@ -30,6 +30,7 @@ const BODYHTML = `
     </body>
 `
 
+
 export const frameHtml = ({
     title,
     image,
@@ -37,55 +38,37 @@ export const frameHtml = ({
     postUrl,
     buttons,
     textInput
-}: {
-    title?: string,
-    image: string,
-    description?: string,
+  }: {
+    title?: string
+    image: string
+    description?: string
     postUrl: string
-    buttons?: {
-        text: string,
-        index: number,
-        action?: string,
-        target?: string,
-        post_url?: string,
-        redirect: boolean
-    }[],
+    buttons?: Array<{
+      text: string
+      index: number
+      redirect: boolean
+      link?: string
+    }>
     textInput?: {
-        placeholder: string,
+      placeholder: string
     } | undefined
-    txUrl?: string
-}) => {
-
+  }) => {
     const DESCRIPTION = description ? `<meta property="og:description" content="${description}" />` : ''
-
-    const BUTTONS = (buttons ?? []).map(({ text, index, redirect, action, target, post_url }) => {
-        let buttonText = `
-        <meta property="fc:frame:button:${index}${redirect ? ':post_redirect' : ''}" content="${text}" />
-        `
-        if (action) {
-            buttonText += `
-            <meta property="fc:frame:button:${index}:action" content="${action}" />
-            `
-        }
-        if (target) {
-            buttonText += `
-            <meta property="fc:frame:button:${index}:target" content="${target}" />
-            `
-        }
-
-        if (post_url) {
-            buttonText += `
-            <meta property="fc:frame:button:${index}:post_url" content="${post_url}" />
-            `
-        }
-
-        return buttonText
-
+  
+    const BUTTONS = (buttons ?? []).map(({ text, index, redirect, link = '' }) => {
+      return redirect
+        ? `<meta property="fc:frame:button:${index}" content="${text}" />
+      <meta property="fc:frame:button:${index}:action" content="link" />
+      <meta property="fc:frame:button:${index}:target" content="${link}" />`
+        : `
+      <meta property="fc:frame:button:${index}" content="${text}" />
+      `
     }).join('\n') ?? ''
-
-    const TEXT_INPUT = textInput ?
-        `<meta property="fc:frame:input:text" content="${textInput.placeholder}" />` : ''
-
+  
+    const TEXT_INPUT = textInput
+      ? `<meta property="fc:frame:input:text" content="${textInput.placeholder}" />`
+      : ''
+  
     return `
     <!DOCTYPE html>
     <html>
@@ -99,9 +82,9 @@ export const frameHtml = ({
       ${BUTTONS}
       ${TEXT_INPUT}
       </head>
-        ${BODYHTML}
     </html>`
-}
+  }
+  
 
 export const getImage = async (path: string) => {
     const file = fs.readFileSync(path)
