@@ -6,6 +6,7 @@
     "build": "tsup && yarn copy-public"
   },
   "dependencies": {
+    "@airstack/frames": "^1.2.0",
     "@hono/node-server": "^1.7.0",
     "@sentry/node": "^7.99.0",
     "@supabase/supabase-js": "^2.45.2",

@@ -1,8 +1,9 @@
-import { frameHtml, HOST } from '../utils'
+import { frameHtml, HOST, verifyMessage } from '../utils'
 import { getSupaClient  } from '../db/supa'
 import type { Context } from 'hono'
 import type { T_FRAME_API_BODY } from '../types'
 import Jimp from 'jimp';
+
 
 
 const FID_LIMIT = 10;
@@ -182,8 +183,11 @@ export const ghHandleProfileFrame = async (c : Context) => {
     let text 
     const isPost = c.req.method === 'POST'
 
+ 
     if (isPost) {
-        const { untrustedData } = (await c.req.json()) as T_FRAME_API_BODY
+        const body = (await c.req.json()) as T_FRAME_API_BODY
+        const { untrustedData } = body
+        await verifyMessage(body)
         fid = untrustedData.fid
         castHash = untrustedData.castId.hash
         text = untrustedData.inputText

@@ -4,7 +4,7 @@ export interface T_FRAME_API_BODY {
       url: string
       messageHash: string
       timestamp: number
-      network: string
+      network: number
       buttonIndex: number
       inputText: string
       castId: {

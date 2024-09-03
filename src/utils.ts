@@ -1,9 +1,22 @@
 import * as fs from 'fs'
 import Jimp from 'jimp';
-const mime = import('mime')
 import { parseEther } from 'viem'
+import {
+  validateFramesMessage as verifyMessageWithAirstack,
+  ValidateFramesMessageInput,
+  init
+} from '@airstack/frames'
+import type { T_FRAME_API_BODY } from './types'
+
+const mime = import('mime')
 
 const API_BASE = 'https://api.yup.io'
+
+const AIRSTACK_KEY = process.env.AIRSTACK_KEY || ''
+
+let wasAirStackError = false
+let wasAirStackInit = false
+
 
 export const AVAILABLE_FRAMES = {
     FRAME_SCORE: '/frame/score',
@@ -13,6 +26,17 @@ export const AVAILABLE_FRAMES = {
 
 export const AVAILABLE_FRAMES_TX = {
     FRAME_DONATE_TX: '/frame/donate-tx'
+}
+
+
+const airstackInit = async () => {
+  if ( wasAirStackError || wasAirStackInit) return
+  try {
+      init(AIRSTACK_KEY)
+      wasAirStackInit = true
+  } catch (err) {
+    wasAirStackError = true
+  }
 }
 
 const TESTING = false
@@ -161,3 +185,17 @@ export const sendNativeTokenTx = async (address: string, amount: string, chain: 
     }
   }
 }
+
+
+export const verifyMessage = async (body: T_FRAME_API_BODY): Promise<{ valid: boolean }> => {
+  try {
+    if (!wasAirStackInit && !wasAirStackError) {
+      await airstackInit()
+    }
+    const verify = await verifyMessageWithAirstack(body as ValidateFramesMessageInput)
+    return { valid: verify.isValid }
+  } catch (e) {
+    return { valid: false }
+  }
+}
+ 
