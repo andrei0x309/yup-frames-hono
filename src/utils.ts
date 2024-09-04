@@ -29,7 +29,7 @@ export const AVAILABLE_FRAMES_TX = {
 }
 
 
-const airstackInit = async () => {
+const airstackInit = () => {
   if ( wasAirStackError || wasAirStackInit) return
   try {
       init(AIRSTACK_KEY)
