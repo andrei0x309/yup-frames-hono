@@ -17,6 +17,7 @@ import {
   from './utils'
 import * as Sentry from "@sentry/node";
 import { ghHandleProfileIntial, ghHandleProfileFrame, imagesMap as ghImagesMap } from './frames/github-roast'
+import { verifyMessage } from './utils'
 
 const port = Number(process.env.PORT) || 4001
 const SENTRY_DSN = process.env.SENTRY_DSN || ''
@@ -289,6 +290,13 @@ app.post('/frame/github-roast', ghHandleProfileIntial)
 app.post('/frame/github-roast-generate', ghHandleProfileFrame)
 app.post('/frame/github-roast/:profile', ghHandleProfileFrame)
 app.get('/frame/github-roast/:profile', ghHandleProfileFrame)
+
+
+app.post('/verify-message', async (c) => {
+  const body = await c.req.json()
+  await verifyMessage(body)
+  return c.json({ status: 'ok' })
+})
 
 console.log(`Server is running on port ${port}`)
 
