@@ -223,8 +223,8 @@ app.post(AVAILABLE_FRAMES.FRAME_ELIGIBILITY, async (c) => {
 
 app.get(AVAILABLE_FRAMES.FRAME_DONATE, async (c) => {
   const address = '0x01Ca6f13E48fC5E231351bA38e7E51A1a7835d8D'
-  const amount = '0.00001'
-  const chainId = 84532
+  const amount = '0.1'
+  const chainId = 666666666
 
   const getTargetUrl = (address: string, amount: string, chainId: number) => {
     return `${HOST}/frame/donate-tx?address=${address}&amount=${amount}&chainId=${chainId}`
@@ -295,6 +295,30 @@ app.get('/frame/github-roast/:profile', ghHandleProfileFrame)
 app.post('/verify-message', async (c) => {
   const body = await c.req.json()
   await verifyMessage(body)
+  return c.json({ status: 'ok' })
+})
+
+app.get('/log', async (c) => {
+  console.log('log get')
+
+  const json = {
+    "type":"composer",
+    "name":"MiniApp",
+    "icon":"book",
+    "description": "MiniApp Link",
+    "imageUrl":"https://paragraph.xyz/branding/logo_no_text.png",
+    "aboutUrl":"https://yup.live/changelog",
+    "action":{"type":"post"}
+  }
+
+  return c.json(json)
+})
+
+app.post('/log', async (c) => {
+  const body = await c.req.json()
+  const query = c.req.query()
+  console.log(query)
+  console.log(body)
   return c.json({ status: 'ok' })
 })
 
