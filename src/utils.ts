@@ -54,61 +54,71 @@ const BODYHTML = `
     </body>
 `
 
-
 export const frameHtml = ({
-    title,
-    image,
-    description,
-    postUrl,
-    buttons,
-    textInput
-  }: {
-    title?: string
-    image: string
-    description?: string
-    postUrl: string
-    buttons?: Array<{
-      text: string
-      index: number
-      redirect: boolean
-      link?: string
-    }>
-    textInput?: {
-      placeholder: string
-    } | undefined
-  }) => {
-    const DESCRIPTION = description ? `<meta property="og:description" content="${description}" />` : ''
-  
-    const BUTTONS = (buttons ?? []).map(({ text, index, redirect, link = '' }) => {
-      return redirect
-        ? `<meta property="fc:frame:button:${index}" content="${text}" />
-      <meta property="fc:frame:button:${index}:action" content="link" />
-      <meta property="fc:frame:button:${index}:target" content="${link}" />`
-        : `
+  title,
+  image,
+  description,
+  postUrl,
+  buttons,
+  textInput
+}: {
+  title?: string
+  image: string
+  description?: string
+  postUrl: string
+  buttons?: Array<{
+    text: string
+    index: number
+    redirect: boolean
+    link?: string
+    action?: string,
+    target?: string
+  }>
+  textInput?: {
+    placeholder: string
+  } | undefined
+}) => {
+  const DESCRIPTION = description ? `<meta property="og:description" content="${description}" />` : ''
+
+  const BUTTONS = (buttons ?? []).map(({target, action, text, index, redirect, link = '' }) => {
+
+    if(action === 'tx') {
+      return `
       <meta property="fc:frame:button:${index}" content="${text}" />
+      <meta property="fc:frame:button:${index}:action" content="tx" />
+      <meta property="fc:frame:button:${index}:target" content="${target}" />
       `
-    }).join('\n') ?? ''
-  
-    const TEXT_INPUT = textInput
-      ? `<meta property="fc:frame:input:text" content="${textInput.placeholder}" />`
-      : ''
-  
-    return `
-    <!DOCTYPE html>
-    <html>
-      <head>
-      <meta property="og:title" content="${title}" />
-      <meta property="og:image" content="${image}" />
-      ${DESCRIPTION}
-      <meta property="fc:frame" content="vNext" />
-      <meta property="fc:frame:image" content="${image}" />
-      <meta property="fc:frame:post_url" content="${postUrl}" />
-      ${BUTTONS}
-      ${TEXT_INPUT}
-      </head>
-    </html>`
-  }
-  
+    }
+
+    return redirect
+      ? `<meta property="fc:frame:button:${index}" content="${text}" />
+    <meta property="fc:frame:button:${index}:action" content="link" />
+    <meta property="fc:frame:button:${index}:target" content="${link}" />`
+      : `
+    <meta property="fc:frame:button:${index}" content="${text}" />
+    `
+  }).join('\n') ?? ''
+
+  const TEXT_INPUT = textInput
+    ? `<meta property="fc:frame:input:text" content="${textInput.placeholder}" />`
+    : ''
+
+  return `
+  <!DOCTYPE html>
+  <html>
+    <head>
+    <meta property="og:title" content="${title}" />
+    <meta property="og:image" content="${image}" />
+    ${DESCRIPTION}
+    <meta property="fc:frame" content="vNext" />
+    <meta property="fc:frame:image" content="${image}" />
+    <meta property="fc:frame:post_url" content="${postUrl}" />
+    ${BUTTONS}
+    ${TEXT_INPUT}
+    </head>
+  </html>`
+}
+
 
 export const getImage = async (path: string) => {
     const file = fs.readFileSync(path)

@@ -223,8 +223,8 @@ app.post(AVAILABLE_FRAMES.FRAME_ELIGIBILITY, async (c) => {
 
 app.get(AVAILABLE_FRAMES.FRAME_DONATE, async (c) => {
   const address = '0x01Ca6f13E48fC5E231351bA38e7E51A1a7835d8D'
-  const amount = '0.1'
-  const chainId = 666666666
+  const amount = '0.000001'
+  const chainId = 8453
 
   const getTargetUrl = (address: string, amount: string, chainId: number) => {
     return `${HOST}/frame/donate-tx?address=${address}&amount=${amount}&chainId=${chainId}`
