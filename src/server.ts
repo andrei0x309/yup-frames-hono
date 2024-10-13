@@ -18,8 +18,11 @@ import {
 import * as Sentry from "@sentry/node";
 import { ghHandleProfileIntial, ghHandleProfileFrame, imagesMap as ghImagesMap } from './frames/github-roast'
 import { verifyMessage } from './utils'
+import { getChannelStats } from './endpoints/api.channels-stats'
 
-const port = Number(process.env.PORT) || 4001
+console.log('Starting server', process.env.PORT)
+
+const port = Number(process.env.PORT) || 4002
 const SENTRY_DSN = process.env.SENTRY_DSN || ''
 
 if (SENTRY_DSN) {
@@ -321,6 +324,8 @@ app.post('/log', async (c) => {
   console.log(body)
   return c.json({ status: 'ok' })
 })
+
+app.get('/api/channels-stats', getChannelStats)
 
 console.log(`Server is running on port ${port}`)
 
